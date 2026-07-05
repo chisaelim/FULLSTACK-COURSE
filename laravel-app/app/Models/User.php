@@ -18,7 +18,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Storage;
 
-#[Fillable(['name', 'email', 'password', 'profile_image', 'level'])]
+#[Fillable(['name', 'email', 'password', 'profile_image', 'level', 'status'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -77,5 +77,15 @@ class User extends Authenticatable
     protected function scopeIsUser(Builder $query): void
     {
         $query->where('level', 'USER');
+    }
+
+    protected function scopeIsEnabled(Builder $query): void
+    {
+        $query->where('status', 'ENABLED');
+    }
+
+    protected function scopeIsDisabled(Builder $query): void
+    {
+        $query->where('status', 'DISABLED');
     }
 }
