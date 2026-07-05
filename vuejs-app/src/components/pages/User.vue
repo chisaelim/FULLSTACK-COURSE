@@ -50,6 +50,7 @@
                   <th>Name</th>
                   <th>Email</th>
                   <th>Level</th>
+                  <th>Status</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -59,9 +60,12 @@
                   <td>{{ user.name }}</td>
                   <td>{{ user.email }}</td>
                   <td>{{ user.level }}</td>
+                  <td><span class="badge" :class="user.status === 'ENABLED' ? 'badge-success' : 'badge-danger'">{{
+                    user.status }}</span></td>
                   <td>
                     <button class="mx-1 btn btn-sm btn-primary" @click="viewUser(user.id)">Edit</button>
                     <button class="mx-1 btn btn-sm btn-danger" @click="removeUser(user.id)">Delete</button>
+                    <button class="mx-1 btn btn-sm btn-warning" @click="toggleUserStatus(user.id)">Toggle</button>
                   </td>
                 </tr>
               </tbody>
@@ -199,7 +203,7 @@
 <script setup>
 import $ from "jquery";
 import Swal from "sweetalert2";
-import { apiGetUsers, apiCreateUser, apiUpdateUser, apiReadUser, apiDeleteUser } from "@/functions/api/user";
+import { apiGetUsers, apiCreateUser, apiUpdateUser, apiReadUser, apiDeleteUser, apiToggleUserStatus } from "@/functions/api/user";
 import { CloseModal, LoadingModal, MessageModal } from "@/functions/swal";
 import { onMounted, ref, reactive, watch } from "vue";
 
@@ -358,6 +362,17 @@ async function removeUser(id) {
       }
     }
   });
+}
+
+async function toggleUserStatus(id) {
+  try {
+    LoadingModal();
+    const response = await apiToggleUserStatus(id);
+    onUserUpdate(response.data.user);
+    return MessageModal({ icon: "success", title: "Success", text: response.data.message });
+  } catch (error) {
+    return MessageModal({ icon: "error", title: "Error", text: error.response?.data?.message || error.message });
+  }
 }
 
 
